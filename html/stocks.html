@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name='viewport' content='width=device-width, user-scalable=no'>
+	<title>Inventario</title>
+
+<!--  ======================= LIB GLOBAL =======================  -->
+	<link rel="stylesheet" href="lib/bootstrap_335.min.css">
+	<link rel="stylesheet" href="lib/font-awesome_430.min.css">
+
+	<script type='text/javascript' src="lib/jquery_321.min.js"></script>
+	<script type='text/javascript' src="lib/bootstrap_337.min.js"></script>
+	<script type='text/javascript' src="lib/vue_2517.js"></script>
+	<script type='text/javascript' src='lib/libBase64.js'></script>
+
+	<link rel="stylesheet" href="css/vueModal.css">
+
+	<script type='module' src='js/stocks.js'></script>
+
+<style type="text/css">
+.item {
+	cursor: pointer;
+}
+ul {
+	padding-left: 2em;
+	line-height: 1.5em;
+	list-style-type: none;
+}
+</style>
+
+</head>
+<body>
+
+	<nav class="navbar navbar-inverse">
+		<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">Inventario</a>
+			</div>
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="index.html">Home</a></li>
+
+
+			</ul>
+
+			<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-user">&nbsp;</i><span id="usrMenu"> User</span>
+					<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="javascript:cambiaPwdUser()">Cambiar password</a></li>
+						<li><a href="javascript:cierraSesion()">Cerrar sesión</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</nav> 
+
+
+<div class="container">
+<div class="row">
+
+<div class="col-md-12">
+<!-- the demo root element -->
+<ul id="stock">
+	<item class="item" :model="treeData"> </item>
+</ul>
+</div> <!-- col-md-10 -->
+
+</div> <!--row -->
+</div> <!-- container -->
+<script type="text/x-template" id="item-template">
+	<li style =" margin-top:2px;border-left:1px solid gray">
+		<div>
+			<span	@click="toggle" class="btn btn-info btn-xs" v-if="isFolder && open"><i class="fa fa-minus"></i></span>
+			<span	@click="toggle" class="btn btn-info btn-xs" v-else-if="isFolder && !open"><i class="fa fa-plus"></i></span>
+			 <b>{{ model.tag }}	</b> {{ model.descrip }}
+			<span class="btn btn-warning btn-xs pull-right"	@click="editItem"><i class="fa fa-pencil"></i></span>
+		</div>
+		<ul v-show="open" v-if="isFolder">
+			<item
+				class="item"
+				v-for="(model, index) in model.hijos"
+				:key="index"
+				:model="model">
+			</item>
+			<li class="btn btn-default btn-xs " @click="addChild()">+</li>
+		</ul>
+	</li>
+</script>
+
+	<div id="appModal">
+		<modal v-bind:clase="modo" v-if="show" @close="show = false" @graba="graba()" @borra="borra()">
+			<h3 slot="header">{{conds.retol}}</h3>
+			<div slot="body">
+				<form	v-if="edit_t === 'USER'" class="form">
+					<input class="form-control" v-model="item.tag" type="text" name="usr"	placeholder="Usuario">
+					<span class="error" v-if="(!conds.valid.tag.ok)">{{conds.valid.tag.txt}}</span>
+					<input class="form-control" v-model="item.obj.pwd" type="text" name="pwd" placeholder="Password">
+					<span class="error" v-if="(!conds.valid.pwd.ok)">{{conds.valid.pwd.txt}}</span>
+					<input class="form-control" v-model="item.obj.conf" type="text" name="conf" placeholder="Confirmac.">
+					<span class="error" v-if="(!conds.valid.conf.ok)">{{conds.valid.conf.txt}}</span>
+				</form>
+
+
+				<form	v-if="edit_t === 'CHKEO'" class="form">
+					<select size="8" class="form-control">
+						<option v-for="item in items" :value="item.obj.keo" @click="idAct = item.obj.keo">{{ item.tag }}</option>
+					</select>
+				</form>
+
+			<form v-else-if="edit_t === 'STOCK'" class="form" action="javascript:grabaNuevoStock()">
+				<input v-model="stock" type="text" name="stock">
+				<input type="submit" value="Grabar">
+			</form>
+
+			<form v-else-if="edit_t === 'ITEM'" class="form" action="javascript:grabaNuevoItem()">
+				 <input v-model="item.id0" type="hidden" name="id0">
+				<input class="form-control" v-model="item.tag" type="text" name="tag" placeholder="Tag">
+				<input	v-if="item.iam != 'rNodo'" class="form-control" v-model="item.obj.descrip" type="text" name="descrip" placeholder="Descripción">
+				<input class="btn btn-success" type="button" value="Grabar" onclick = "javascript:grabaNuevoItem()">
+				<input v-if="item.hijos.length == 0"	class="btn btn-default" type="button" value="+ Hijo" onclick = "javascript:addNuevoHijo()">
+			</form>
+
+			<form v-else-if="edit_t === 'CHISME'" class="form" action="javascript:grabaNuevoOwner()">
+				<input class="form-control" v-model="chisme.tag" type="text" name="tag"	placeholder="Alias">
+				<input class="form-control" v-model="chisme.obj.nombre" type="text" name="nombre" placeholder="Nombre">
+				<input class="form-control" v-model="chisme.obj.apell" type="text" name="apell"	placeholder="Apellidos">
+				<input class="form-control" v-model="chisme.obj.email" type="text" name="email"	placeholder="e-Mail">
+				<input class="form-control" v-model="chisme.obj.telef" type="text" name="telef"	placeholder="Telefono">
+				<input class="form-control" v-model="chisme.obj.codResa" type="text" name="codResa"	placeholder="Código RESA">
+				<input class="form-control" v-model="chisme.obj.codIBAN" type="text" name="codIBAN"	placeholder="IBAN">
+				<input class="form-control" type="submit" value="Grabar">
+			</form>
+
+			</div>
+		</modal>
+	</div> <!-- appEdit -->
+	<!-- appEdit -->
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+	<meta name='viewport' content='width=device-width, user-scalable=no'>
+	<title>Login</title>
+
+
+<!--  ==================== LOCAL ==================  -->
+   <link rel="stylesheet" href="lib/bootstrap_335.min.css">
+   <link rel="stylesheet" href="lib/font-awesome_430.min.css">
+   <script type='text/javascript' src="lib/jquery_321.min.js"></script>
+   <script type='text/javascript' src="lib/bootstrap_337.min.js"></script>
+   <script type='text/javascript' src="lib/vue_2517.js"></script>
+	<script type='text/javascript' src='lib/libBase64.js'></script>
+
+  <script type="module" src="/js/index.js"></script>
+
+</head>
+
+
+<body style="background-image: url('img/stocks.jpg')">
+	<div class="container">
+		<div class="row">
+	    <div id="loginbox" class="mainbox col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3"> 
+        <div class="panel panel-default"  style="margin-top:125px">
+					<div class="panel-heading">
+
+						<div class="panel-title text-center">
+							<h3 style="color:maroon;display:inline-block;font-size:300%">RETO/Stocks v. 1.0</h3>
+							<button style="font-size:180%" class="btn btn-success pull-right" onclick="goPag('INFO')" >
+								<i class="fa fa-info-circle"></i> 
+							</button>
+						</div>
+					</div>     
+
+					<div class="panel-body" id="divLogin" >
+						<form name="form" id="form" class="form-horizontal" enctype="multipart/form-data" method="POST" action="">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-user"></i></span>
+								<input v-model="user" id="user" type="text" class="form-control" name="user" value="" placeholder="Usuario">                                        
+							</div>
+
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+								<input v-model="pwd" id="password" type="password" class="form-control" name="password" placeholder="Password">
+							</div>                                                                  
+
+							<div class="form-group">
+								<div class="col-sm-12 controls">
+									<button id="submit" type="button" class="btn btn-primary  form-control" v-on:click="validaUsrPwd()"><i class="fa fa-sign-in"></i> Entrar</button>
+									<span style="color:red" v-if="error === true">Usuario/password erróneo</span>
+									<span style="color:red" v-if="noRol === true">Usuario/ROL erróneo</span>
+								</div>
+							</div>
+						</form>     
+					</div>  <!-- divLogin -->                   
+        </div>  <!-- panel-default -->
+			</div> <!-- loginbox -->
+		</div> <!-- row -->
+	</div> <!-- container -->
+
+</body>
+</html>
