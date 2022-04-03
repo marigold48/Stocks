@@ -1,2 +1,2 @@
 .headers ON
-select * from users where _id="ADMIN_Agro" and id0=0;
+select * from users where _id="ADMIN_Stocks" and id0=0;
